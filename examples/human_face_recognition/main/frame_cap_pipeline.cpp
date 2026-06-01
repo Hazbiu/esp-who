@@ -32,8 +32,18 @@ WhoFrameCap *get_dvp_frame_cap_pipeline()
 WhoFrameCap *get_mipi_csi_frame_cap_pipeline()
 {
     auto cam = new WhoP4Cam(V4L2_PIX_FMT_RGB565, MODEL_TIME + 3);
+
     auto frame_cap = new WhoFrameCap();
-    frame_cap->add_node<WhoFetchNode>("FrameCapFetch", cam);
+    frame_cap->add_node<WhoFetchNode>("FrameCapFetch", cam, false);
+
+    frame_cap->add_node<WhoPPAResizeNode>(
+        "FrameCapPPAResize",
+        800,
+        1280,
+        dl::image::DL_IMAGE_PIX_TYPE_RGB565LE,
+        MODEL_TIME + 1
+    );
+
     return frame_cap;
 }
 
@@ -46,12 +56,12 @@ WhoFrameCap *get_uvc_frame_cap_pipeline()
     // FetchNode ringbuf_len is at least 2, and the fb_count of the cam is at least 4.
     frame_cap->add_node<WhoFetchNode>("FrameCapFetch", cam, false);
     // The DecodeNode ringbuf_len relies on the following PPAResizeNode process time, the time of data transfer.
-    frame_cap->add_node<WhoDecodeNode>("FrameCapDecode", dl::image::DL_IMAGE_PIX_TYPE_RGB565, 2, false);
+    frame_cap->add_node<WhoDecodeNode>("FrameCapDecode", dl::image::DL_IMAGE_PIX_TYPE_RGB565LE, 2, false);
     // The ppa resized fb will display on lcd, if you want to make sure the displayed detection result is synced with
     // the frame, the ringbuf size must be big enough to cover the process time from now to the the detection result is
     // ready.
     frame_cap->add_node<WhoPPAResizeNode>(
-        "FrameCapPPAResize", 800, 600, dl::image::DL_IMAGE_PIX_TYPE_RGB565, MODEL_TIME + 1);
+        "FrameCapPPAResize", 800, 600, dl::image::DL_IMAGE_PIX_TYPE_RGB565LE, MODEL_TIME + 1);
     return frame_cap;
 }
 #endif

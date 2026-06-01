@@ -15,8 +15,8 @@ void WhoLCD::init(const lvgl_port_cfg_t &lvgl_port_cfg)
     ESP_ERROR_CHECK(bsp_display_new(&bsp_disp_cfg, &panel_handle, &io_handle));
     esp_lcd_panel_disp_on_off(panel_handle, true);
 #ifdef BSP_BOARD_ESP32_S3_KORVO_2
-    bool mirror_x = true;
-    bool mirror_y = true;
+    bool mirror_x = false;
+    bool mirror_y = false;
 #else
     bool mirror_x = false;
     bool mirror_y = false;

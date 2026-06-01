@@ -178,11 +178,19 @@ esp_err_t WhoP4Cam::close_video_device()
 
 esp_err_t WhoP4Cam::set_video_format()
 {
-    if (CONFIG_CAMERA_SC2336_MIPI_IF_FORMAT_INDEX_DEFAULT < 8) {
-        ESP_LOGE(TAG, "raw10 cam mode is not supported.");
+#if CONFIG_CAMERA_OV5647
+    if (CONFIG_CAMERA_OV5647_MIPI_IF_FORMAT_INDEX_DEFAULT >= 3) {
+        ESP_LOGE(TAG, "OV5647 RAW10 cam mode is not supported here. Select a RAW8 mode.");
         close(m_fd);
         return ESP_FAIL;
     }
+#elif CONFIG_CAMERA_SC2336
+    if (CONFIG_CAMERA_SC2336_MIPI_IF_FORMAT_INDEX_DEFAULT < 8) {
+        ESP_LOGE(TAG, "SC2336 raw10 cam mode is not supported here. Select a RAW8 mode.");
+        close(m_fd);
+        return ESP_FAIL;
+    }
+#endif
     struct v4l2_format format = {};
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(m_fd, VIDIOC_G_FMT, &format) != 0) {

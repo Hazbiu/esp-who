@@ -7,3 +7,4 @@ sdkconfig.old
 managed_components/
 
 .clangd
+/examples/human_face_recognition/local_components
